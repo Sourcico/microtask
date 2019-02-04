@@ -3,6 +3,7 @@
         <ul>
             <li v-for="(item, index) in items" v-bind:key="index">
                 <TaskStep v-bind:name="item.message" /> 
+                <input type="checkbox" id="checkbox" v-model="checked">
             </li>
         </ul>
     </div>
