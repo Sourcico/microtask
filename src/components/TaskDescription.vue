@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p> Task in progress </p>
+        <br><h5> Add new task </h5>
     </div>
 </template>
 

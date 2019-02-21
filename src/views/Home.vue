@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <Task title="task lifecycle"/>
+    <Task title="Task lifecycle"/>
   </div>
 </template>
 
