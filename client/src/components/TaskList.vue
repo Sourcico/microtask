@@ -1,23 +1,23 @@
 <template>
 
     <div id="item-list">
-        <form @submit.prevent="addElement">
-            <input type="text" v-model="itemName" style="margin: 5px;">
-            <button class="btn btn-success" v-on:click="addElement(itemName)">+</button><br><br>
+        <form method="POST" @submit.prevent="addElement(this.itemName)">
+            <input type="text" v-model="itemName" ref="i_name" style="margin: 5px;">
+            <input class="btn btn-success" v-on:click="addElement(itemName)" type="submit" value="+">
             <ul>
                 <li v-for="(item, index) in tasks" v-bind:key="index">
-                    
                     <div id="showP" v-if="showParagraph">
                         <input type="text" v-model="item.name" style="margin: 2px;">
-                        <button v-on:click="save">Save</button>
+                        <!-- <input class="" v-on:click="updateElement(itemName)" type="submit" value="Save"> -->
                     </div>
-                    <TaskStep id="itm2" v-if="!showParagraph" v-bind:name="item.name" style="margin: 2px;"></TaskStep>
+                    <TaskStep id="itm2" v-if="!showParagraph" v-model="iName" v-bind:name="item.name" style="margin: 2px;"></TaskStep>
                     <input type="checkbox" id="checkbox2"  v-if="!showParagraph" style="margin: 1px;">
-                    <button class="btn btn-danger" v-if="!showParagraph" v-on:click="removeElement(index)" style="margin: 1px;">Delete</button>
+                    <button class="btn btn-danger" v-if="!showParagraph" v-on:click="removeElement(item._id)" style="margin: 1px;">Delete</button>
                     <br>
                 </li>
                 <button class="btn btn-info" v-if="!showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Edit</button>
-                <button class="btn btn-info" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Cancel</button>
+                <button class="btn btn-info"  v-on:click="updateElement(iName)" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Save</button>
+                <button class="btn btn-info" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">X</button>
             </ul>
         </form>
     </div>
@@ -40,27 +40,36 @@ export default {
             tasks: {},
             showParagraph: false
         };
-
         api.getListData().then(function(response) {
-            //console.log('RESPONSE BE ', response);
             data.tasks = response.data.data;
         });
-        console.log('DATAAAAAAAA ', data);
         return data;
 
     },
     methods: {
-        removeElement: function(index){
-            this.tasks.splice(index, 1);
+        addElement: function(itemName){
+            this.tasks.push({name: itemName });
+            return api.addElement(itemName);
         },
-        addElement: function(){
-            this.tasks.push({ id: 2, message: this.itemName });
-            //api.deleteHome();
+
+        // updateElement: function(iName){
+        //     this.tasks.push(iName);
+        //     return api.updateElement(iName);
+        // },
+
+        // updateElement: function(index){
+        //     this.tasks.push(index);
+        //     return api.updateElement(index);
+        // },
+
+        removeElement: function(index){
+            this.tasks.splice(index);
+            return api.removeElement(index);            
         },
 
         getListData: function (){
             return api.getListData();
-        }//ovaa funckija ja ima vo api.js
+        }
     }
 }
 

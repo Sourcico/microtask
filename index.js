@@ -1,22 +1,10 @@
 const express = require('express');
+const bodyParser = require("body-parser");
 const cors = require('cors');
 const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
-//const config = require('./DB.js');
-//import api from './client/src/services/api/api.js';
 mongoose.connect('mongodb://localhost/tasks');
-// let db = mongoose.connection;
-
-// //check connection
-// db.once('open', function(){
-// 	console.log('Connected to mongodb');
-// });
-
-// //check for DB errors
-// db.on('error', function(err){
-// 	console.log(err);
-// });
 
 let taskSchema = new mongoose.Schema({
 	name:{
@@ -26,145 +14,96 @@ let taskSchema = new mongoose.Schema({
 });
 mongoose.model('Task', taskSchema);
 const Task = mongoose.model('Task');
-// let Task = require('./models/task.js');
 
 app.use(cors());
-// app.use(bodyParser.urlencoded({extended: true}));
-// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-//app.get('/', (req, res) => res.send('Hello world'));
 
-//app.get('/', (req, res) => res.send('Hello world'));
-
+//GET Route
 app.get('/list', (req, res) => {
-
-	// var oneTask = new Task({name: 'task123'});
-	// // oneTask.push();
-	// oneTask.save(function (err) {
-	// 	if (err) {
-	// 		console.log('errrrr: ', err);
-	// 	}
-	// 	console.log('TASK SAVED');
-	// });
-	//console.log('DB CONFIG ', Task.db.name, Task.db.host, Task.db.port);
  	Task.find({}, function(err, tasks) {
  		res.send({
  			status: 200,
  			message: 'OK',
  			data: tasks
  		});
- 		//console.log('HELLO TASKS ', tasks);
  	});
 });
 
 
+//DELETE route
+app.delete('/delete/:id', (req, res) => {
+	let query = {_id:req.params.id}
 
+	Task.findByIdAndRemove(query, (err,task) =>{
+        if(err) res.json(err);
+        else res.json('Task successfully removed');
+    });
+});
 
+// app.post('/update/:id', (req, res) => {
+// 	let task = {};
+// 	task.name = req.body.name;
+// 	let query = {_id:req.params.id}
 
-
-
-// app.get('/home', (req, res) => {
-//     // res.setHeader('Access-Control-Expose-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-//     // res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST, OPTIONS, PUT, PATCH, DELETE');
-//     // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     //  res.setHeader('Access-Control-Allow-Credentials', true);
-//     res.json({deleteRequest: 'OKAY'});
-// });
-
-
-// app.post('/home', (req, res) => {
-//     // res.setHeader('Access-Control-Expose-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-//     // res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST, OPTIONS, PUT, PATCH, DELETE');
-//     // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     //  res.setHeader('Access-Control-Allow-Credentials', true);
-//     res.send('POST request');
-// });
-
-// app.delete('/home', (req, res) => {
-//     // res.setHeader('Access-Control-Expose-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-//     // res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST, OPTIONS, PUT, PATCH, DELETE');
-//     // res.setHeader('Access-Control-Allow-Headers', 'Access-Control-*, Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     //  res.setHeader('Access-Control-Allow-Credentials', true);
-//     res.send('DELETE request');
+// 	Task.findByIdAndUpdate(query, task, (err,task) =>{
+//         if(err) res.json(err);
+//         else res.json('Task successfully updated');
+//     });
 // });
 
 
 
+//CREATE Route
+app.post('/create', function(req, res){
+	let task = new Task();
+	task.name = req.body.name;
 
+	task.save(function(err){
+		if(err){
+			console.log('ima greska',err);
+			return;
+		} else {
+			res.json('task added');
+		}
+	});
+});
 
+//UPDATE Route
+// app.post('/update', function(req, res){
+// 	let task = new Task();
+// 	//console.log('OK ');
+// 	//console.log('bodyy ', req.body);
+// 	task.name = req.body.name;
 
-
-//NEW ROUTES
-//GET single task
-// app.get('/task/:id', function(req, res){
-// 	Tasks.findById(req.params.id, function(err, task){
-// 		res.render('task', {
-// 			task:task
-// 		});
+// 	task.save(function(err){
+// 		if(err){
+// 			console.log('ima greska',err);
+// 			return;
+// 		} else {
+// 			res.json('task added');
+// 		}
 // 	});
 // });
 
-
-// home route
-// app.get('/', function(req, res){
-// 	Task.find({}, function(err, tasks){
-// 		if(err){
-// 			console.log(err);
-		
-// 		} else {
-// 			res.render('task', {
-// 				title:'Tasks',
-// 				tasks: tasks
+// app.put('/update/:id', function(req, res){
+// 	Task.findById(req.params.id, (err, task)=>{
+// 		if(!task)
+// 			return next(new Error('Error getting task'));
+// 		else {
+// 			task.name = req.body.name;
+// 			task.save().then(task => {
+// 				res.json("task updated");
+// 			})
+// 			.catch(err=> {
+// 				res.status(400).send("error");
 // 			});
 // 		}
 // 	});
+	
 // });
 
-// Add Route
-// app.post('/tasks/add', function(req, res){
-// 	let task = new Task();
-// 	task.title = req.body.title;
-	
-// 	Task.save(function(err){
-// 		if(err){
-// 			console.log(err);
-// 			return;
-// 		} else {
-// 			res.redirect('/');
-// 		}
-// 	});
-// });
 
-// UPDATE Route
-// app.post('/articles/edit/:id', function(req, res){
-// 	let task = {};
-// 	task.title = req.body.title;
-	
-// 	let query = {_id:req.params.id}
-	
-// 	Task.update(query, article, function(err){
-// 		if(err){
-// 			console.log(err);
-// 			return;
-// 		} else {
-// 			res.redirect('/');
-// 		}
-// 	});
-// });
-
-// DELETE route
-// app.get('/tasks/:id', (req, res) => {
-// 	let query = {_id:req.params.id}
-	
-// 	Article.remove(query, function(err){
-// 		if(err){
-// 			console.log(err);
-// 		}
-// 			res.redirect('/');
-// 	});
-// });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
