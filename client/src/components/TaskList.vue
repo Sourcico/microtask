@@ -1,23 +1,22 @@
 <template>
 
     <div id="item-list">
-        <form method="POST" @submit.prevent="addElement(this.itemName)">
-            <input type="text" v-model="itemName" ref="i_name" style="margin: 5px;">
-            <input class="btn btn-success" v-on:click="addElement(itemName)" type="submit" value="+">
+        <form method="POST" @submit.prevent="">
+            <input type="text" v-model="itemName" v-if="!showParagraph" style="margin: 5px;" placeholder="Add new task">
+            <input class="btn btn-success" v-on:click="addElement(itemName)" v-if="!showParagraph" type="submit" value="+">
             <ul>
                 <li v-for="(item, index) in tasks" v-bind:key="index">
                     <div id="showP" v-if="showParagraph">
                         <input type="text" v-model="item.name" style="margin: 2px;">
-                        <!-- <input class="" v-on:click="updateElement(itemName)" type="submit" value="Save"> -->
                     </div>
-                    <TaskStep id="itm2" v-if="!showParagraph" v-model="iName" v-bind:name="item.name" style="margin: 2px;"></TaskStep>
+                    <TaskStep id="itm2" v-if="!showParagraph" v-bind:name="item.name" style="margin: 2px;"></TaskStep>
                     <input type="checkbox" id="checkbox2"  v-if="!showParagraph" style="margin: 1px;">
                     <button class="btn btn-danger" v-if="!showParagraph" v-on:click="removeElement(item._id)" style="margin: 1px;">Delete</button>
-                    <br>
+                    <button class="btn btn-success"  v-on:click="updateElement(item._id, item.name)" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Save</button>
+                   <br>
                 </li>
                 <button class="btn btn-info" v-if="!showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Edit</button>
-                <button class="btn btn-info"  v-on:click="updateElement(iName)" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Save</button>
-                <button class="btn btn-info" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">X</button>
+                <button class="btn btn-danger" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">X</button>
             </ul>
         </form>
     </div>
@@ -48,21 +47,20 @@ export default {
     },
     methods: {
         addElement: function(itemName){
+            this.$router.push('add');
             this.tasks.push({name: itemName });
             return api.addElement(itemName);
         },
 
-        // updateElement: function(iName){
-        //     this.tasks.push(iName);
-        //     return api.updateElement(iName);
-        // },
+        updateElement: function(index, name){
+            this.$router.push('edit');
+            this.tasks.push({_id:index, name: name});
+            return api.updateElement(index, {name: name});
+        },
 
-        // updateElement: function(index){
-        //     this.tasks.push(index);
-        //     return api.updateElement(index);
-        // },
 
         removeElement: function(index){
+            this.$router.push('delete');
             this.tasks.splice(index);
             return api.removeElement(index);            
         },
