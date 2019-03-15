@@ -9,7 +9,7 @@
                     <div id="showP" v-if="showParagraph">
                         <input type="text" v-model="item.name" style="margin: 2px;">
                     </div>
-                    <TaskStep id="itm2" v-if="!showParagraph" v-bind:name="item.name" style="margin: 2px;"></TaskStep>
+                    <router-link :to="{name: 'singleTask', params: {id:item._id}}"><TaskStep id="itm2" v-if="!showParagraph" v-bind:name="item.name" style="margin: 2px;"></TaskStep></router-link>
                     <input type="checkbox" id="checkbox2"  v-if="!showParagraph" style="margin: 1px;">
                     <button class="btn btn-danger" v-if="!showParagraph" v-on:click="removeElement(item._id)" style="margin: 1px;">Delete</button>
                     <button class="btn btn-success"  v-on:click="updateElement(item._id, item.name)" v-if="showParagraph" @click="showParagraph = !showParagraph" style="margin: 1px;">Save</button>
@@ -47,20 +47,20 @@ export default {
     },
     methods: {
         addElement: function(itemName){
-            this.$router.push('add');
+            this.$router.push('/add');
             this.tasks.push({name: itemName });
             return api.addElement(itemName);
         },
 
         updateElement: function(index, name){
-            this.$router.push('edit');
+            this.$router.push('/edit');
+            this.tasks.splice(index);
             this.tasks.push({_id:index, name: name});
             return api.updateElement(index, {name: name});
         },
 
-
         removeElement: function(index){
-            this.$router.push('delete');
+            this.$router.push('/delete');
             this.tasks.splice(index);
             return api.removeElement(index);            
         },

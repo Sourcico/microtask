@@ -11,6 +11,14 @@ axios.defaults.baseURL = 'http://localhost:3000';
 
 Vue.config.productionTip = false
 
+// const routes = [
+// 	{
+// 		name: 'home',
+// 		path: '/',
+// 		component: TaskList
+// 	}
+// ];
+
 new Vue({
   router,
   store,

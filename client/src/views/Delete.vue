@@ -7,6 +7,4 @@
 
 <script>
 	
-
-	
 </script>
