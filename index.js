@@ -44,6 +44,7 @@ app.delete('/delete/:id', (req, res) => {
 app.post('/create', function(req, res){
 	let task = new Task();
 	task.name = req.body.name;
+	task.created_at = new Date();
 
 	task.save(function(err){
 		if(err){

@@ -1,10 +1,13 @@
 let mongoose = require('mongoose');
 
-//Article schema
+//Task schema
 let taskSchema = new mongoose.Schema({
 	name:{
 		type: String,
 		required: true
+	},
+	created_at:{
+		type: Date
 	}
 	
 });

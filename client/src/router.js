@@ -67,12 +67,12 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Page2.vue')
     },
     {
-      path: '/singleTask/:id',
+      path: '/:id',
       name: 'singleTask',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Task.vue')
+      component: () => import(/* webpackChunkName: "about" */ './views/Home.vue')
     }
   ]
 })
