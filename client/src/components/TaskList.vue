@@ -97,6 +97,7 @@ export default {
     },
     methods: {
         addElement: function(itemName){
+            alert('New task added');
             this.tasks.push({name: itemName});
             return api.addElement(itemName);
         },
@@ -111,8 +112,10 @@ export default {
         removeElement: function(index){
             //this.$router.push('/');
             //window.location.reload();
-            this.tasks.splice(index,1);
-            return api.removeElement(index);            
+            alert('Task is deleted');
+            this.tasks.splice(index);
+            return api.removeElement(index);
+                        
         },
 
         getListData: function (){

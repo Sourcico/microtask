@@ -21,10 +21,10 @@
         <router-link to="/about" class="btn btn-dark">About</router-link>
       </label>
       <label class="btn btn-secondary">
-        <router-link to="/page/1" class="btn btn-dark">Page 1</router-link>
+        <router-link to="/page1" class="btn btn-dark">Register</router-link>
       </label>
       <label class="btn btn-secondary">
-        <router-link to="/page/2" class="btn btn-dark">Page 2</router-link>
+        <router-link to="/page2" class="btn btn-dark">Login</router-link>
       </label>
     </div>
     <router-view/>

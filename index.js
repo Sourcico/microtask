@@ -6,14 +6,45 @@ const port = 3000;
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/tasks');
 
+
+const router = express.Router();
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+
 let taskSchema = new mongoose.Schema({
 	name:{
 		type: String,
 		required: true
+	},
+	datum:{
+		type: String,
+		required: true
 	}
+
 });
 mongoose.model('Task', taskSchema);
 const Task = mongoose.model('Task');
+
+
+const UserSchema = mongoose.Schema({
+  email:{
+    type: String,
+    required: true
+  },
+  username:{
+    type: String,
+    required: true
+  },
+  password:{
+    type: String,
+    required: true
+  }
+});
+
+mongoose.model('User', UserSchema);
+const User = mongoose.model('User');
+
+
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,10 +72,61 @@ app.delete('/delete/:id', (req, res) => {
 });
 
 
+//REGISTER START
+app.post('/user/register', function(req, res){
+  
+  const name = req.body.name;
+  const email = req.body.email;
+  const username = req.body.username;
+  const password = req.body.password;
+ 
+
+  if(!email)
+  	return res.json({
+  		status: 422,
+  		message: 'Please provide email'
+  	});
+  if(!username)
+  	return res.json({
+  		status: 422,
+  		message: 'Please provide username'
+  	});
+  if(!password)
+  	return res.json({
+  		status: 422,
+  		message: 'Please provide password'
+  	});
+  
+    let newUser = new User({
+      email:email,
+      username:username,
+      password:password
+    });
+
+    bcrypt.genSalt(10, function(err, salt){
+      bcrypt.hash(newUser.password, salt, function(err, hash){
+        if(err){
+          console.log(err);
+        }
+        newUser.password = hash;
+        newUser.save(function(err){
+          if(err){
+            console.log(err);
+            return;
+          } else {
+            res.json('You are registered')
+          }
+        });
+      });
+    });
+});
+//REGISTER END
+
+
 app.post('/create', function(req, res){
 	let task = new Task();
 	task.name = req.body.name;
-	task.created_at = new Date();
+	task.datum = new Date();
 
 	task.save(function(err){
 		if(err){
@@ -70,6 +152,5 @@ app.post('/update/:id', (req, res) => {
     	}
     });
 });
-
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
