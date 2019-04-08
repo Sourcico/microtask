@@ -5,12 +5,12 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/tasks');
-
-
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
+//TASKS schema
 let taskSchema = new mongoose.Schema({
 	name:{
 		type: String,
@@ -20,12 +20,11 @@ let taskSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	}
-
 });
 mongoose.model('Task', taskSchema);
 const Task = mongoose.model('Task');
 
-
+//REGISTER schema
 const UserSchema = mongoose.Schema({
   email:{
     type: String,
@@ -40,16 +39,12 @@ const UserSchema = mongoose.Schema({
     required: true
   }
 });
-
 mongoose.model('User', UserSchema);
 const User = mongoose.model('User');
-
-
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 
 app.get('/list', (req, res) => {
  	Task.find({}, function(err, tasks) {
@@ -61,7 +56,6 @@ app.get('/list', (req, res) => {
  	});
 });
 
-
 app.delete('/delete/:id', (req, res) => {
 	let query = {_id:req.params.id}
 
@@ -71,15 +65,12 @@ app.delete('/delete/:id', (req, res) => {
     });
 });
 
-
-//REGISTER START
+//REGISTER PROCESS
 app.post('/user/register', function(req, res){
-  
   const name = req.body.name;
   const email = req.body.email;
   const username = req.body.username;
   const password = req.body.password;
- 
 
   if(!email)
   	return res.json({
@@ -120,7 +111,66 @@ app.post('/user/register', function(req, res){
       });
     });
 });
-//REGISTER END
+
+
+app.use(passport.initialize());
+// app.use(passport.session());
+
+
+passport.use(new LocalStrategy({
+  passReqToCallback : true
+}, function(username, password, done){
+    // Match Username
+    let query = {username:username};
+    User.findOne(query, function(err, user){
+      if(err) throw err;
+      if(!user){
+        return done(null, false, {message: 'No user found'});
+      }
+
+      // Match Password
+      bcrypt.compare(password, user.password, function(err, isMatch){
+        if(err) throw err;
+        if(isMatch){
+          return done(null, user);
+        } else {
+          return done(null, false, {message: 'Wrong password'});
+        }
+      });
+    });
+}));
+
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+      done(err, user);
+    });
+});
+
+
+// Login Form
+app.get('/user/login', function(req, res){
+  res.render('login');
+});
+
+// Login Process
+app.post('/user/login', function(req, res, next){
+	console.log('in login function', req.body);
+  passport.authenticate('local', {
+    successRedirect:'/',
+    failureRedirect:'/page2',
+    failureFlash: true
+  })(req, res, next);
+});
+
+// logout
+app.get('/logout', function(req, res){
+  req.logout();
+  res.json('success', 'You are logged out');
+});
 
 
 app.post('/create', function(req, res){
@@ -137,7 +187,6 @@ app.post('/create', function(req, res){
 		}
 	});
 });
-
 
 app.post('/update/:id', (req, res) => {
 	let task = {};

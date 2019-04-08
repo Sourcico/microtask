@@ -22,25 +22,22 @@
   <script>
 	  import api from './../services/api/api2.js';
 	  	export default {
-	    
-		    data () {
-		        return data;
-
-		    },
+		    // data () {
+		    //     return data;
+		    // },
 		    methods: {
 		        addUser: function(username, email, password, password2){
 		        	alert('New user added');
-
+              this.$router.push('/'); 
 		        	const data={
 		        		username: username, 
 		        		email: email,
 		        		password: password
 		        	};
-
-	    	        return api.addUser(data);
+	    	      return api.addUser(data);
 		        }
 		    }
-		}
+		  }
   </script>
 
 

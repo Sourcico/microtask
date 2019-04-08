@@ -1,7 +1,7 @@
 <template>
   <div class="singleTask">
     <!-- <h1>This is Single Task</h1> -->
-<br>
+	<br>
     <p>
       Task ID is: {{ $route.params.id}}
     </p>
