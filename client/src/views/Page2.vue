@@ -5,7 +5,7 @@
       <form method="POST" @submit.prevent="">
             <input type="text" v-model="username" style="margin: 5px;" placeholder="username">
             <br>
-            <input type="text" v-model="password" style="margin: 5px;" placeholder="password">
+            <input type="password" v-model="password" style="margin: 5px;" placeholder="password">
             <br>
             <input class="btn btn-success" v-on:click="loginUser(username, password)" type="submit" value="Login">
        </form>
@@ -20,8 +20,8 @@
         // },
         methods: {
             loginUser: function(username, password){
-              console.log('in login function');
-              //this.$router.push('/'); 
+              //console.log('in login function');
+              //this.$router.push('/');
               const data={
                 username: username,
                 password: password

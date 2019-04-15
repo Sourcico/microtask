@@ -5,10 +5,15 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/tasks');
-const router = express.Router();
+const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+var jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
+// const config = require('./config/database');
+const passportJWT = require("passport-jwt");
+const ExtractJWT = passportJWT.ExtractJwt;
+const JWTStrategy   = passportJWT.Strategy;
 
 //TASKS schema
 let taskSchema = new mongoose.Schema({
@@ -112,65 +117,47 @@ app.post('/user/register', function(req, res){
     });
 });
 
+//LOGIN PROCESS
+app.post('/user/login', function(req, res){
+	//console.log('its in login/user')
+    let data = {
+        username: req.body.username,
+        // password: req.body.password
+    };
 
-app.use(passport.initialize());
-// app.use(passport.session());
-
-
-passport.use(new LocalStrategy({
-  passReqToCallback : true
-}, function(username, password, done){
-    // Match Username
-    let query = {username:username};
-    User.findOne(query, function(err, user){
-      if(err) throw err;
-      if(!user){
-        return done(null, false, {message: 'No user found'});
-      }
-
-      // Match Password
-      bcrypt.compare(password, user.password, function(err, isMatch){
-        if(err) throw err;
-        if(isMatch){
-          return done(null, user);
-        } else {
-          return done(null, false, {message: 'Wrong password'});
+    User.findOne(data).lean().exec(function(err, user){
+        if(err){
+        	console.log('Error');
+            return res.json({error: true});
         }
-      });
-    });
-}));
+        if(!user){
+        	console.log('Wrong user');
+            return res.status(404).json({'message':'User not found!'});
+        }
+       	console.log('You are logged in');
+        console.log(user);
 
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
+        bcrypt.compare(req.body.password, user.password, function(err, response) {
+          if(!response) {
+            return res.status(404).json({'message':'Incorrect Password'});   
+          }
+          //global.config.jwt_secret
+          let token = jwt.sign(user, 'shhhhh', {
+              expiresIn: 1440 // expires in 1 hour
+          });
+
+          res.json({error:false, token: token});
+
+        });
+    })
 });
 
-passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-      done(err, user);
-    });
-});
-
-
-// Login Form
-app.get('/user/login', function(req, res){
-  res.render('login');
-});
-
-// Login Process
-app.post('/user/login', function(req, res, next){
-	console.log('in login function', req.body);
-  passport.authenticate('local', {
-    successRedirect:'/',
-    failureRedirect:'/page2',
-    failureFlash: true
-  })(req, res, next);
-});
 
 // logout
-app.get('/logout', function(req, res){
-  req.logout();
-  res.json('success', 'You are logged out');
-});
+// app.get('/logout', function(req, res){
+//   req.logout();
+//   res.json('success', 'You are logged out');
+// });
 
 
 app.post('/create', function(req, res){

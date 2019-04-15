@@ -97,6 +97,7 @@ export default {
     },
     methods: {
         addElement: function(itemName){
+
             alert('New task added');
             this.tasks.push({name: itemName});
             return api.addElement(itemName);

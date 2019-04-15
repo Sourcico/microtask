@@ -28,7 +28,7 @@
 		    methods: {
 		        addUser: function(username, email, password, password2){
 		        	alert('New user added');
-              this.$router.push('/'); 
+              this.$router.push('/page2');
 		        	const data={
 		        		username: username, 
 		        		email: email,
